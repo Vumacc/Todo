@@ -45,14 +45,14 @@ class Todo
     {
         foreach(string i in list)
         { // Index has +1 so it's easier for people to read when displayed
-            Console.WriteLine($"{(list.IndexOf(i))+1} : {i}");
+            Console.WriteLine($"| {(list.IndexOf(i))+1} | {i}");
         }
     }
     private void MoveEntryTo(List<string> origin, int destination)
     {
-        Console.WriteLine("------------------------------------------------\n");
+        Console.WriteLine("------------------------------------------------");
         listList(origin);
-        Console.WriteLine("\n------------------------------------------------");
+        Console.WriteLine("------------------------------------------------");
 
         Console.Write($"Select index of entry you want to move to list {destination}:\n  > ");
         int entryIndex = Convert.ToInt32(Console.ReadLine());
@@ -80,7 +80,7 @@ class Todo
                 break;
         }
 
-        Console.WriteLine($"\nMoved entry {entryIndex} to list {destination}");
+        Console.WriteLine($"\nMoved entry {entryIndex+1} to list {destination}");
     }
     public void AddEntry()
     {
@@ -111,12 +111,16 @@ class Todo
     public void MoveEntry()
     {
         Console.Clear();
-        Console.WriteLine("/####################\\");
-        Console.WriteLine("| 1 | To-Do          |");
-        Console.WriteLine("| 2 | Doing          |");
-        Console.WriteLine("| 3 | Finished       |");
-        Console.WriteLine("\\####################/");
-        Console.WriteLine("Select origin and destination ({origin} to {destination}):");
+        Console.WriteLine("--------------------------");
+        Console.WriteLine("|ID |     List Name      |");
+        Console.WriteLine("--------------------------");
+        Console.WriteLine("| 1 | To-Do              |");
+        Console.WriteLine("| 2 | Doing              |");
+        Console.WriteLine("| 3 | Finished           |");
+        Console.WriteLine("--------------------------");
+
+        Console.WriteLine("Origin is where an entry will be taken from. Destination is where it will be moved to.");
+        Console.WriteLine("Select list ID of origin and destination ({origin} to {destination}):");
         Console.Write("  > ");
 
         string rawMoveInput = Console.ReadLine();
