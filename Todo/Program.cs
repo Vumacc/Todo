@@ -3,12 +3,12 @@
 while (true)
 {
     Console.Clear();
-    Console.WriteLine("    To-Do    ");
+    // Maybe I could add a big title with figlet or smth
     Console.WriteLine("------------------------------------------------");
     Console.WriteLine("| 1 | Add new entry                            |");
     Console.WriteLine("| 2 | List all entries                         |");
     Console.WriteLine("| 3 | Move entry to different list             |");
-    Console.WriteLine("| 4 | Delete entry                             |");
+    Console.WriteLine("| 4 | Trash entry                              |");
     Console.WriteLine("| 5 | Mystery option                           |");
     Console.WriteLine("------------------------------------------------");
     Console.Write("Select option:\n  > ");
@@ -40,6 +40,7 @@ class Todo
     List<string> listTodo = new List<string> ();
     List<string> listDoing = new List<string> ();
     List<string> listFinished = new List<string> ();
+    List<string> listTrash = new List<string> ();
 
     private void listList(List<string> list)
     {
@@ -67,6 +68,7 @@ class Todo
         string entryToMove = origin[entryIndex];
 
         origin.RemoveAt(entryIndex);
+
         switch (destination)
         {
             case 1: // To-Do
@@ -77,6 +79,9 @@ class Todo
                 break;
             case 3: // Finished
                 listFinished.Add(entryToMove);
+                break;
+            case 4: // Trash
+                listTrash.Add(entryToMove);
                 break;
         }
 
@@ -139,6 +144,11 @@ class Todo
             Console.WriteLine("MoveEntry origin and destination same value");
             Environment.Exit(0);
         }
+        else if (destination >= 4 || origin <= 0)
+        {
+            Console.WriteLine("MoveEntry destination out of range");
+            Environment.Exit(0);
+        }
 
         Console.Clear();
         if (origin == 1) // To-Do
@@ -164,6 +174,53 @@ class Todo
     }
     public void DeleteEntry()
     {
+                Console.Clear();
+        Console.WriteLine("--------------------------");
+        Console.WriteLine("|ID |     List Name      |");
+        Console.WriteLine("--------------------------");
+        Console.WriteLine("| 1 | To-Do              |");
+        Console.WriteLine("| 2 | Doing              |");
+        Console.WriteLine("| 3 | Finished           |");
+        Console.WriteLine("| . |--------------------|");
+        Console.WriteLine("| . |      Actions       |");
+        Console.WriteLine("| . |--------------------|");
+        Console.WriteLine("| 4 | View trash list    |");
+        Console.WriteLine("| 5 | Clear trash list   |");
+        Console.WriteLine("--------------------------");
+
+        Console.WriteLine("Select list ID of where you want to trash an entry, or action you would like to do:");
+        Console.Write("  > ");
+
+        int trashInput = Convert.ToInt32(Console.ReadLine());
+
+        switch (trashInput)
+        {
+            case 1: // Trash entry in To-Do
+                MoveEntryTo(listTodo, 4);
+                break;
+            case 2: // Trash entry in Doing
+                MoveEntryTo(listDoing, 4);
+                break;
+            case 3: // Trash entry in Finished
+                MoveEntryTo(listDoing, 4);
+                break;
+            case 4: // View Trash list
+                listList(listTrash);
+                Console.Write("\nPress any key to continue...");
+                Console.ReadKey();
+                break;
+            case 5: // Clear Trash list
+                foreach (string i in listTrash)
+                {
+                    listTrash.RemoveAt(listTrash.IndexOf(i));
+                }
+                break;
+            default:
+                Console.WriteLine("DeleteEntry trashInput out of range");
+                Environment.Exit(0);
+                break;
+        }
+
 
     }
     public void WriteFile()
