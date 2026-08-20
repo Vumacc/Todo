@@ -1,5 +1,7 @@
 ﻿Todo todo = new Todo();
 
+todo.ReadFile();
+
 while (true)
 {
 
@@ -10,7 +12,7 @@ while (true)
     Console.WriteLine("| 2 | List all entries                         |");
     Console.WriteLine("| 3 | Move entry to different list             |");
     Console.WriteLine("| 4 | Trash entry                              |");
-    Console.WriteLine("| 5 | Mystery option                           |");
+    Console.WriteLine("| 5 | Exit                                     |");
     Console.WriteLine("------------------------------------------------");
     Console.Write("Select option:\n  > ");
 
@@ -30,8 +32,16 @@ while (true)
         case 4: // Delete entry
             todo.DeleteEntry();
             break;
-        default:
+        case 5: // Exit
             Environment.Exit(0);
+            break;
+        case 6: // Debug write
+            todo.WriteFile();
+            break;
+        case 7: // Debug read
+            todo.ReadFile();
+            break;
+        default:
             break;
     }
 }
@@ -43,6 +53,8 @@ class Todo
     List<string> listFinished = new List<string> ();
     List<string> listTrash = new List<string> ();
 
+    public string path = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".vumc_todo.txt");
+
     private void listList(List<string> list)
     {
         foreach(string i in list)
@@ -50,13 +62,18 @@ class Todo
             Console.WriteLine($"| {(list.IndexOf(i))+1} | {i}");
         }
     }
-    private void MoveEntryTo(List<string> origin, int destination)
+    private void MoveEntryTo(List<string> origin, int destination, bool trashEntry = false)
     {
         Console.WriteLine("------------------------------------------------");
         listList(origin);
         Console.WriteLine("------------------------------------------------");
 
-        Console.Write($"Select index of entry you want to move to list {destination}:\n  > ");
+        string selectText = trashEntry ?
+        $"Choose index of entry you want to delete. Select 0 to trash all.\nSelect entry:\n  > "
+        :
+        $"Select index of entry you want to move to list {destination}:\n  > ";
+
+        Console.Write(selectText);
         int entryIndex = Convert.ToInt32(Console.ReadLine());
         entryIndex--; // Decrement to get true index since displayed index is +1
 
@@ -66,34 +83,45 @@ class Todo
             Environment.Exit(0);
         }
 
-        string entryToMove = origin[entryIndex];
-
-        origin.RemoveAt(entryIndex);
-
-        switch (destination)
+        if (entryIndex == -1)
+        { // TODO: Move entries from origin to listTrash when deleting all entries. Maybe use a loop to copy over everything? or is there a member of List<T> that does that? Gotta look into it
+            origin.Clear();
+        }
+        else
         {
-            case 1: // To-Do
-                listTodo.Add(entryToMove);
-                break;
-            case 2: // Doing
-                listDoing.Add(entryToMove);
-                break;
-            case 3: // Finished
-                listFinished.Add(entryToMove);
-                break;
-            case 4: // Trash
-                listTrash.Add(entryToMove);
-                break;
+            string entryToMove = origin[entryIndex];
+            origin.RemoveAt(entryIndex);
+
+            switch (destination)
+            {
+                case 1: // To-Do
+                    listTodo.Add(entryToMove);
+                    break;
+                case 2: // Doing
+                    listDoing.Add(entryToMove);
+                    break;
+                case 3: // Finished
+                    listFinished.Add(entryToMove);
+                    break;
+                case 4: // Trash
+                    listTrash.Add(entryToMove);
+                    break;
+            }
         }
 
-        Console.WriteLine($"\nMoved entry {entryIndex+1} to list {destination}");
+        string movedText = trashEntry ?
+        $"\nTrashed entry {entryIndex+1} of list {destination}"
+        :
+        $"\nMoved entry {entryIndex+1} to list {destination}";
+
+        Console.WriteLine(movedText);
     }
     public void AddEntry()
     {
         Console.Clear();
         Console.WriteLine("Add new entry to To-Do list:");
         Console.Write("  > ");
-        string newEntry = Console.ReadLine();
+        string? newEntry = Console.ReadLine();
         listTodo.Add(newEntry);
     }
     public void ListEntry()
@@ -129,7 +157,7 @@ class Todo
         Console.WriteLine("Select list ID of origin and destination ({origin} to {destination}):");
         Console.Write("  > ");
 
-        string rawMoveInput = Console.ReadLine();
+        string? rawMoveInput = Console.ReadLine();
         string[] moveInput = rawMoveInput.Split(" ");
 
         if (moveInput.Count() >= 4)
@@ -200,13 +228,13 @@ class Todo
         switch (trashInput)
         {
             case 1: // Trash entry in To-Do
-                MoveEntryTo(listTodo, (int)Lists.Trash);
+                MoveEntryTo(listTodo, 4, true);
                 break;
             case 2: // Trash entry in Doing
-                MoveEntryTo(listDoing, (int)Lists.Trash);
+                MoveEntryTo(listDoing, 4, true);
                 break;
             case 3: // Trash entry in Finished
-                MoveEntryTo(listFinished, (int)Lists.Trash);
+                MoveEntryTo(listFinished, 4, true);
                 break;
             case 4: // View Trash list
                 Console.Clear();
@@ -224,25 +252,51 @@ class Todo
                 Environment.Exit(0);
                 break;
         }
-
-
     }
     public void WriteFile()
     {
-        // Write .txt file with data
+        StreamWriter writer = new StreamWriter(path);
+
+        using (writer)
+        {
+            foreach(string i in listTodo)
+            {
+                writer.WriteLine("todo:"+i);
+            }
+            foreach(string i in listDoing)
+            {
+                writer.WriteLine("doing:"+i);
+            }
+            foreach(string i in listFinished)
+            {
+                writer.WriteLine("finish:"+i);
+            }
+        }
     }
     public void ReadFile()
     {
-        // Read .txt file with data
+        StreamReader reader = new StreamReader(path);
+
+        using (reader)
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                string[] lineParse = line.Split(":");
+
+                if (lineParse[0] == "todo")
+                {
+                    listTodo.Add(lineParse[1]);
+                }
+                else if (lineParse[0] == "doing")
+                {
+                    listDoing.Add(lineParse[1]);
+                }
+                else if (lineParse[0] == "finish")
+                {
+                    listFinished.Add(lineParse[1]);
+                }
+            }
+        }
     }
 }
-
-// Might be useful for readability
-enum Lists
-{
-    Todo = 1,
-    Doing = 2,
-    Finished = 3,
-    Trash = 4,
-
-};
