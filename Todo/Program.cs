@@ -2,6 +2,7 @@
 
 while (true)
 {
+
     Console.Clear();
     // Maybe I could add a big title with figlet or smth
     Console.WriteLine("------------------------------------------------");
@@ -133,7 +134,8 @@ class Todo
 
         if (moveInput.Count() >= 4)
         {
-
+            Console.WriteLine("MoveEntry moveInput out of range");
+            Environment.Exit(0);
         }
 
         int origin = Convert.ToInt32(moveInput[0]);
@@ -193,27 +195,29 @@ class Todo
 
         int trashInput = Convert.ToInt32(Console.ReadLine());
 
+        Console.Clear();
+
         switch (trashInput)
         {
             case 1: // Trash entry in To-Do
-                MoveEntryTo(listTodo, 4);
+                MoveEntryTo(listTodo, (int)Lists.Trash);
                 break;
             case 2: // Trash entry in Doing
-                MoveEntryTo(listDoing, 4);
+                MoveEntryTo(listDoing, (int)Lists.Trash);
                 break;
             case 3: // Trash entry in Finished
-                MoveEntryTo(listDoing, 4);
+                MoveEntryTo(listFinished, (int)Lists.Trash);
                 break;
             case 4: // View Trash list
+                Console.Clear();
+                Console.WriteLine("------------------------------------------------");
                 listList(listTrash);
+                Console.WriteLine("------------------------------------------------");
                 Console.Write("\nPress any key to continue...");
                 Console.ReadKey();
                 break;
             case 5: // Clear Trash list
-                foreach (string i in listTrash)
-                {
-                    listTrash.RemoveAt(listTrash.IndexOf(i));
-                }
+                listTrash.Clear();
                 break;
             default:
                 Console.WriteLine("DeleteEntry trashInput out of range");
@@ -232,3 +236,13 @@ class Todo
         // Read .txt file with data
     }
 }
+
+// Might be useful for readability
+enum Lists
+{
+    Todo = 1,
+    Doing = 2,
+    Finished = 3,
+    Trash = 4,
+
+};
