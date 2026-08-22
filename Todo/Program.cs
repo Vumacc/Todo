@@ -124,6 +124,10 @@ class Todo
         // $"\nMoved all entries to list {destination}";
 
         Console.WriteLine(movedText);
+
+        Console.Write("Press any key to continue...");
+        Console.ReadKey();
+        WriteFile();
     }
     private void MoveEntryTo2(List<string> origin, int destination, string moveContent)
     {
@@ -150,6 +154,7 @@ class Todo
         Console.Write("  > ");
         string? newEntry = Console.ReadLine();
         listTodo.Add(newEntry);
+        WriteFile();
     }
     public void ListEntry()
     {
@@ -265,6 +270,7 @@ class Todo
                 break;
             case 4: // View Trash list
                 Console.Clear();
+                Console.WriteLine("Trash list is not saved unlike other lists");
                 Console.WriteLine("------------------------------------------------");
                 listList(listTrash);
                 Console.WriteLine("------------------------------------------------");
