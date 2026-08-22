@@ -4,8 +4,8 @@ try
 {
     todo.ReadFile();
 }
-catch (Exception e)
-{
+catch (Exception)
+{ // Maybe I should just make the file without asking for input, makes it more smooth
     Console.Clear();
     Console.Write(".vumc_todo.txt is not found. Create one? (Y/N):\n  > ");
     if (Console.ReadKey().Key == ConsoleKey.Y)
@@ -86,7 +86,7 @@ class Todo
         string selectText = trashEntry ?
         $"Choose index of entry you want to delete. Select 0 to trash all.\nSelect entry:\n  > "
         :
-        $"Select index of entry you want to move to list {destination}:\n  > ";
+        $"Choose index of entry you want to move to list {destination}. Select 0 to move all\nSelect entry:\n  > ";
 
         Console.Write(selectText);
         int entryIndex = Convert.ToInt32(Console.ReadLine());
@@ -99,7 +99,11 @@ class Todo
         }
 
         if (entryIndex == -1)
-        { // TODO: Move entries from origin to listTrash when deleting all entries. Maybe use a loop to copy over everything? or is there a member of List<T> that does that? Gotta look into it
+        {
+            foreach(string i in origin)
+            {
+                MoveEntryTo2(origin, destination, i);
+            }
             origin.Clear();
         }
         else
@@ -107,29 +111,37 @@ class Todo
             string entryToMove = origin[entryIndex];
             origin.RemoveAt(entryIndex);
 
-            switch (destination)
-            {
-                case 1: // To-Do
-                    listTodo.Add(entryToMove);
-                    break;
-                case 2: // Doing
-                    listDoing.Add(entryToMove);
-                    break;
-                case 3: // Finished
-                    listFinished.Add(entryToMove);
-                    break;
-                case 4: // Trash
-                    listTrash.Add(entryToMove);
-                    break;
-            }
+            MoveEntryTo2(origin, destination, entryToMove);
         }
 
         string movedText = trashEntry ?
-        $"\nTrashed entry {entryIndex+1} of list {destination}"
+        $"\nTrashed entry {entryIndex}"
         :
         $"\nMoved entry {entryIndex+1} to list {destination}";
+        // string moveAllText = (entryIndex == -1) ?
+        // $"\nTrashed all entries"
+        // :
+        // $"\nMoved all entries to list {destination}";
 
         Console.WriteLine(movedText);
+    }
+    private void MoveEntryTo2(List<string> origin, int destination, string moveContent)
+    {
+        switch (destination)
+        {
+            case 1: // To-Do
+                listTodo.Add(moveContent);
+                break;
+            case 2: // Doing
+                listDoing.Add(moveContent);
+                break;
+            case 3: // Finished
+                listFinished.Add(moveContent);
+                break;
+            case 4: // Trash
+                listTrash.Add(moveContent);
+                break;
+        }
     }
     public void AddEntry()
     {
