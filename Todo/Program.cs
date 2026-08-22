@@ -10,12 +10,16 @@ catch (Exception)
     Console.Write(".vumc_todo.txt is not found. Create one? (Y/N):\n  > ");
     if (Console.ReadKey().Key == ConsoleKey.Y)
     {
+        Directory.CreateDirectory(todo.pathConfig);
         todo.WriteFile();
+        Console.WriteLine($"\n\nFile created at: {todo.pathConfig}");
+        todo.ContinueReadKey();
     }
     else
     {
         Console.WriteLine("fwaaaah");
         Console.ReadKey();
+        Environment.Exit(0);
     }
 }
 
@@ -29,7 +33,8 @@ while (true)
     Console.WriteLine("| 2 | List all entries                         |");
     Console.WriteLine("| 3 | Move entry to different list             |");
     Console.WriteLine("| 4 | Trash entry                              |");
-    Console.WriteLine("| 5 | Exit                                     |");
+    Console.WriteLine("| 5 | Settings                                 |");
+    Console.WriteLine("| 6 | Exit                                     |");
     Console.WriteLine("------------------------------------------------");
     Console.Write("Select option:\n  > ");
 
@@ -47,34 +52,50 @@ while (true)
         case ConsoleKey.D4: // Delete entry
             todo.DeleteEntry();
             break;
-        case ConsoleKey.D5: // Exit
+        case ConsoleKey.D5: // Config
             Environment.Exit(0);
             break;
-        case ConsoleKey.D6: // Debug write
+        case ConsoleKey.D6: // Exit
+            Environment.Exit(0);
+            break;
+        case ConsoleKey.D7: // Debug write
             todo.WriteFile();
             break;
-        case ConsoleKey.D7: // Debug read
+        case ConsoleKey.D8: // Debug read
             todo.ReadFile();
+            break;
+        case ConsoleKey.D9: // Debug delete save
+            File.Delete(todo.path);
             break;
         default:
             break;
     }
 }
 
+struct Entry
+{
+    int id;
+    string content;
+    string urgency;
+    DateOnly date;
+    TimeOnly time;
+}
 class Todo
 {
+    List<Entry> zaboinky = new List<Entry> ();
     List<string> listTodo = new List<string> ();
     List<string> listDoing = new List<string> ();
     List<string> listFinished = new List<string> ();
     List<string> listTrash = new List<string> ();
 
-    public string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".vumc_todo.txt");
+    public string pathConfig = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vumacc/");
+    public string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vumacc/todo.txt");
 
     private void listList(List<string> list)
     {
         foreach(string i in list)
         { // Index has +1 so it's easier for people to read when displayed
-            Console.WriteLine($"| {(list.IndexOf(i))+1} | {i}");
+            Console.WriteLine($"|{(list.IndexOf(i))+1}| {i}");
         }
     }
     private void MoveEntryTo(List<string> origin, int destination, bool trashEntry = false)
@@ -100,7 +121,7 @@ class Todo
 
         if (entryIndex == -1)
         {
-            foreach(string i in origin)
+            foreach (string i in origin)
             {
                 MoveEntryTo2(origin, destination, i);
             }
@@ -125,8 +146,7 @@ class Todo
 
         Console.WriteLine(movedText);
 
-        Console.Write("Press any key to continue...");
-        Console.ReadKey();
+        ContinueReadKey();
         WriteFile();
     }
     private void MoveEntryTo2(List<string> origin, int destination, string moveContent)
@@ -152,27 +172,28 @@ class Todo
         Console.Clear();
         Console.WriteLine("Add new entry to To-Do list:");
         Console.Write("  > ");
+        
+        En
         string? newEntry = Console.ReadLine();
-        listTodo.Add(newEntry);
+        zaboinky.Add(newEntry);
         WriteFile();
     }
     public void ListEntry()
     {
         Console.Clear();
-        Console.WriteLine("---- To-Do -------------------------------------------------------------\n");
+        Console.WriteLine("------ To-Do -------------------------------------------------------------");
         listList(listTodo);
 
         Console.WriteLine();
-        Console.WriteLine("---- Doing--------------------------------------------------------------\n");
+        Console.WriteLine("------ Doing--------------------------------------------------------------");
         listList(listDoing);
 
         Console.WriteLine();
-        Console.WriteLine("---- Finished ----------------------------------------------------------\n");
+        Console.WriteLine("------ Finished ----------------------------------------------------------");
         listList(listFinished);
 
-
-        Console.Write("\n----------------------------------------------------------------------\n\nPress any key to continue...");
-        Console.ReadKey();
+        Console.Write("\n--------------------------------------------------------------------------\n");
+        ContinueReadKey();
     }
     public void MoveEntry()
     {
@@ -189,50 +210,55 @@ class Todo
         Console.WriteLine("Select list ID of origin and destination ({origin} to {destination}):");
         Console.Write("  > ");
 
-        string? rawMoveInput = Console.ReadLine();
-        string[] moveInput = rawMoveInput.Split(" ");
+        try
+        {
+            string? rawMoveInput = Console.ReadLine();
+            string[] moveInput = rawMoveInput.Split(" ");
 
-        if (moveInput.Count() >= 4)
-        {
-            Console.WriteLine("MoveEntry moveInput out of range");
-            Environment.Exit(0);
-        }
+            if (moveInput.Count() >= 4)
+            {
+                Console.WriteLine("MoveEntry moveInput out of range");
+                Environment.Exit(0);
+            }
 
-        int origin = Convert.ToInt32(moveInput[0]);
-        int destination = Convert.ToInt32(moveInput[2]);
+            int origin = Convert.ToInt32(moveInput[0]);
+            int destination = Convert.ToInt32(moveInput[2]);
 
-        if (origin == destination)
-        {
-            Console.WriteLine("MoveEntry origin and destination same value");
-            Environment.Exit(0);
-        }
-        else if (destination >= 4 || origin <= 0)
-        {
-            Console.WriteLine("MoveEntry destination out of range");
-            Environment.Exit(0);
-        }
+            if (origin == destination)
+            {
+                Console.WriteLine("MoveEntry origin and destination same value");
+                Environment.Exit(0);
+            }
+            else if (destination >= 4 || origin <= 0)
+            {
+                Console.WriteLine("MoveEntry destination out of range");
+                Environment.Exit(0);
+            }
 
-        Console.Clear();
-        if (origin == 1) // To-Do
-        {
-            MoveEntryTo(listTodo, destination);
+            Console.Clear();
+            if (origin == 1) // To-Do
+            {
+                MoveEntryTo(listTodo, destination);
+            }
+            else if (origin == 2) // Doing
+            {
+                MoveEntryTo(listDoing, destination);
+            }
+            else if (origin == 3) // Finsished
+            {
+                MoveEntryTo(listFinished, destination);
+            }
+            else
+            {
+                Console.WriteLine("\nMoveEntry origin out of range");
+                Environment.Exit(0);
+            }
         }
-        else if (origin == 2) // Doing
+        catch
         {
-            MoveEntryTo(listDoing, destination);
+            Console.WriteLine("\nUnhandled :PPP");
+            ContinueReadKey();
         }
-        else if (origin == 3) // Finsished
-        {
-            MoveEntryTo(listFinished, destination);
-        }
-        else
-        {
-            Console.WriteLine("\nMoveEntry origin out of range");
-            Environment.Exit(0);
-        }
-
-        Console.Write("\nPress any key to continue...");
-        Console.ReadKey();
     }
     public void DeleteEntry()
     {
@@ -253,57 +279,72 @@ class Todo
         Console.WriteLine("Select list ID of where you want to trash an entry, or action you would like to do:");
         Console.Write("  > ");
 
-        int trashInput = Convert.ToInt32(Console.ReadLine());
-
-        Console.Clear();
-
-        switch (trashInput)
+        try
         {
-            case 1: // Trash entry in To-Do
-                MoveEntryTo(listTodo, 4, true);
-                break;
-            case 2: // Trash entry in Doing
-                MoveEntryTo(listDoing, 4, true);
-                break;
-            case 3: // Trash entry in Finished
-                MoveEntryTo(listFinished, 4, true);
-                break;
-            case 4: // View Trash list
-                Console.Clear();
-                Console.WriteLine("Trash list is not saved unlike other lists");
-                Console.WriteLine("------------------------------------------------");
-                listList(listTrash);
-                Console.WriteLine("------------------------------------------------");
-                Console.Write("\nPress any key to continue...");
-                Console.ReadKey();
-                break;
-            case 5: // Clear Trash list
-                listTrash.Clear();
-                break;
-            default:
-                Console.WriteLine("DeleteEntry trashInput out of range");
-                Environment.Exit(0);
-                break;
+            int trashInput = Convert.ToInt32(Console.ReadLine());
+
+            Console.Clear();
+
+            switch (trashInput)
+            {
+                case 1: // Trash entry in To-Do
+                    MoveEntryTo(listTodo, 4, true);
+                    break;
+                case 2: // Trash entry in Doing
+                    MoveEntryTo(listDoing, 4, true);
+                    break;
+                case 3: // Trash entry in Finished
+                    MoveEntryTo(listFinished, 4, true);
+                    break;
+                case 4: // View Trash list
+                    Console.Clear();
+                    Console.WriteLine("Trash list is not saved unlike other lists");
+                    Console.WriteLine("------------------------------------------------");
+                    listList(listTrash);
+                    Console.WriteLine("------------------------------------------------");
+                    ContinueReadKey();
+                    break;
+                case 5: // Clear Trash list
+                    listTrash.Clear();
+                    break;
+                default:
+                    Console.WriteLine("DeleteEntry trashInput out of range");
+                    Environment.Exit(0);
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("\nUnhandled :PPP");
+            ContinueReadKey();
         }
     }
     public void WriteFile()
     {
-        StreamWriter writer = new StreamWriter(path);
-
-        using (writer)
+        try
         {
-            foreach(string i in listTodo)
+            StreamWriter writer = new StreamWriter(path);
+
+            using (writer)
             {
-                writer.WriteLine("todo:"+i);
+                foreach (string i in listTodo)
+                {
+                    writer.WriteLine("todo:"+i);
+                }
+                foreach (string i in listDoing)
+                {
+                    writer.WriteLine("doing:"+i);
+                }
+                foreach (string i in listFinished)
+                {
+                    writer.WriteLine("finish:"+i);
+                }
             }
-            foreach(string i in listDoing)
-            {
-                writer.WriteLine("doing:"+i);
-            }
-            foreach(string i in listFinished)
-            {
-                writer.WriteLine("finish:"+i);
-            }
+        }
+        catch
+        {
+            Console.WriteLine("\nwirte fail "+path);
+            ContinueReadKey();
         }
     }
     public void ReadFile()
@@ -331,5 +372,10 @@ class Todo
                 }
             }
         }
+    }
+    public void ContinueReadKey()
+    {
+        Console.Write("\nPress any key to continue...");
+        Console.ReadKey();
     }
 }
