@@ -33,29 +33,27 @@ while (true)
     Console.WriteLine("------------------------------------------------");
     Console.Write("Select option:\n  > ");
 
-    int input = Convert.ToInt32(Console.ReadLine());
-
-    switch (input)
+    switch (Console.ReadKey().Key)
     {
-        case 1: // Add new entry
+        case ConsoleKey.D1: // Add new entry
             todo.AddEntry();
             break;
-        case 2: // List all entries
+        case ConsoleKey.D2: // List all entries
             todo.ListEntry();
             break;
-        case 3: // Move entry to different list
+        case ConsoleKey.D3: // Move entry to different list
             todo.MoveEntry();
             break;
-        case 4: // Delete entry
+        case ConsoleKey.D4: // Delete entry
             todo.DeleteEntry();
             break;
-        case 5: // Exit
+        case ConsoleKey.D5: // Exit
             Environment.Exit(0);
             break;
-        case 6: // Debug write
+        case ConsoleKey.D6: // Debug write
             todo.WriteFile();
             break;
-        case 7: // Debug read
+        case ConsoleKey.D7: // Debug read
             todo.ReadFile();
             break;
         default:
