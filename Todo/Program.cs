@@ -1,6 +1,23 @@
 ﻿Todo todo = new Todo();
 
-todo.ReadFile();
+try
+{
+    todo.ReadFile();
+}
+catch (Exception e)
+{
+    Console.Clear();
+    Console.Write(".vumc_todo.txt is not found. Create one? (Y/N):\n  > ");
+    if (Console.ReadKey().Key == ConsoleKey.Y)
+    {
+        todo.WriteFile();
+    }
+    else
+    {
+        Console.WriteLine("fwaaaah");
+        Console.ReadKey();
+    }
+}
 
 while (true)
 {
@@ -53,7 +70,7 @@ class Todo
     List<string> listFinished = new List<string> ();
     List<string> listTrash = new List<string> ();
 
-    public string path = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".vumc_todo.txt");
+    public string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".vumc_todo.txt");
 
     private void listList(List<string> list)
     {
