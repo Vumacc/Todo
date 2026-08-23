@@ -4,7 +4,7 @@ try
 {
     todo.ReadFile();
 }
-catch (Exception)
+catch
 { // Maybe I should just make the file without asking for input, makes it more smooth
     Console.Clear();
     Console.Write(".vumc_todo.txt is not found. Create one? (Y/N):\n  > ");
@@ -53,7 +53,7 @@ while (true)
             todo.DeleteEntry();
             break;
         case ConsoleKey.D5: // Config
-            Environment.Exit(0);
+            Environment.Exit(0); // Todo: make config shit. maybe. still vague concept
             break;
         case ConsoleKey.D6: // Exit
             Environment.Exit(0);
@@ -74,31 +74,40 @@ while (true)
 
 struct Entry
 {
-    int id;
-    string content;
-    string urgency;
-    DateOnly date;
-    TimeOnly time;
+    public string Content;
+    public string Urgency;
+    public string DateTime;
+
+    public Entry(string content, string urgency, string dateTime)
+    {
+        Content = content;
+        Urgency = urgency;
+        DateTime = dateTime;
+    }
+
+    public Entry(string v1, string v2, string v3, string v4) : this()
+    {
+    }
 }
+
 class Todo
 {
-    List<Entry> zaboinky = new List<Entry> ();
-    List<string> listTodo = new List<string> ();
-    List<string> listDoing = new List<string> ();
-    List<string> listFinished = new List<string> ();
-    List<string> listTrash = new List<string> ();
+    List<Entry> listTodo = new List<Entry> ();
+    List<Entry> listDoing = new List<Entry> ();
+    List<Entry> listFinished = new List<Entry> ();
+    List<Entry> listTrash = new List<Entry> ();
 
     public string pathConfig = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vumacc/");
     public string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vumacc/todo.txt");
 
-    private void listList(List<string> list)
+    private void listList(List<Entry> list)
     {
-        foreach(string i in list)
-        { // Index has +1 so it's easier for people to read when displayed
-            Console.WriteLine($"|{(list.IndexOf(i))+1}| {i}");
+        foreach (Entry i in list)
+        {
+            Console.WriteLine($"| {list.IndexOf(i)+1} | {i.Urgency} {i.Content}");
         }
     }
-    private void MoveEntryTo(List<string> origin, int destination, bool trashEntry = false)
+    private void MoveEntryTo(List<Entry> origin, int destination, bool trashEntry = false)
     {
         Console.WriteLine("------------------------------------------------");
         listList(origin);
@@ -121,18 +130,17 @@ class Todo
 
         if (entryIndex == -1)
         {
-            foreach (string i in origin)
+            foreach (Entry i in origin)
             {
-                MoveEntryTo2(origin, destination, i);
+                MoveEntryTo2(origin, destination, i.Content, origin.IndexOf(i));
             }
             origin.Clear();
         }
         else
         {
-            string entryToMove = origin[entryIndex];
+            string entryToMove = origin[entryIndex].Content;
+            MoveEntryTo2(origin, destination, entryToMove, entryIndex);
             origin.RemoveAt(entryIndex);
-
-            MoveEntryTo2(origin, destination, entryToMove);
         }
 
         string movedText = trashEntry ?
@@ -149,33 +157,73 @@ class Todo
         ContinueReadKey();
         WriteFile();
     }
-    private void MoveEntryTo2(List<string> origin, int destination, string moveContent)
+    private void MoveEntryTo2(List<Entry> origin, int destination, string moveContent, int index)
     {
+        Entry entry = new Entry(moveContent, origin[index].Urgency, Convert.ToString(DateTime.Now));
         switch (destination)
         {
             case 1: // To-Do
-                listTodo.Add(moveContent);
+                listTodo.Add(entry);
                 break;
             case 2: // Doing
-                listDoing.Add(moveContent);
+                listDoing.Add(entry);
                 break;
             case 3: // Finished
-                listFinished.Add(moveContent);
+                listFinished.Add(entry);
                 break;
             case 4: // Trash
-                listTrash.Add(moveContent);
+                listTrash.Add(entry);
                 break;
+        }
+    }
+    private string Urgency(int urgency)
+    {
+        switch (urgency)
+        {
+            case 1: // Immediate
+                return "\e[41m \e[0m";  // Colour red
+            case 2: // Emergency:
+                return "\e[43m \e[0m";  // Colour yellow
+            case 3: // Urgent
+                return "\e[42m \e[0m";  // Colour green
+            case 4: // Semi-urgent
+                return "\e[100m \e[0m"; // Colour grey
+            case 5: // Non-urgent
+                return "\e[47m \e[0m";  // Colour white
+
+            default:
+                return "defaukt";
         }
     }
     public void AddEntry()
     {
         Console.Clear();
-        Console.WriteLine("Add new entry to To-Do list:");
-        Console.Write("  > ");
-        
-        En
-        string? newEntry = Console.ReadLine();
-        zaboinky.Add(newEntry);
+        Console.Write("Add new entry to To-Do list:\n  > ");
+        string? content = Console.ReadLine();
+
+        Console.WriteLine();
+        Console.WriteLine("-------------------------");
+        Console.WriteLine("|ID |   Urgency level   |");
+        Console.WriteLine("-------------------------");
+        Console.WriteLine($"| 1 | {Urgency(1)} Immediate      |");
+        Console.WriteLine($"| 2 | {Urgency(2)} Emergency      |");
+        Console.WriteLine($"| 3 | {Urgency(3)} Urgent         |");
+        Console.WriteLine($"| 4 | {Urgency(4)} Semi-urgent    |");
+        Console.WriteLine($"| 5 | {Urgency(5)} Non-urgent     |");
+        Console.WriteLine("-------------------------");
+        Console.Write("Choose ID of urgency you want to assign to the entry. Default = 5.\nSelect ID:\n  > ");
+
+        int urgency = 5;
+        try {
+            urgency = Convert.ToInt32(Console.ReadLine());
+        }
+        catch
+        {
+            // Urgency will be the default
+        }
+        Entry entry = new Entry(content, Urgency(urgency), Convert.ToString(DateTime.Now));
+
+        listTodo.Add(entry);
         WriteFile();
     }
     public void ListEntry()
@@ -193,6 +241,7 @@ class Todo
         listList(listFinished);
 
         Console.Write("\n--------------------------------------------------------------------------\n");
+
         ContinueReadKey();
     }
     public void MoveEntry()
@@ -215,25 +264,8 @@ class Todo
             string? rawMoveInput = Console.ReadLine();
             string[] moveInput = rawMoveInput.Split(" ");
 
-            if (moveInput.Count() >= 4)
-            {
-                Console.WriteLine("MoveEntry moveInput out of range");
-                Environment.Exit(0);
-            }
-
             int origin = Convert.ToInt32(moveInput[0]);
             int destination = Convert.ToInt32(moveInput[2]);
-
-            if (origin == destination)
-            {
-                Console.WriteLine("MoveEntry origin and destination same value");
-                Environment.Exit(0);
-            }
-            else if (destination >= 4 || origin <= 0)
-            {
-                Console.WriteLine("MoveEntry destination out of range");
-                Environment.Exit(0);
-            }
 
             Console.Clear();
             if (origin == 1) // To-Do
@@ -254,15 +286,15 @@ class Todo
                 Environment.Exit(0);
             }
         }
-        catch
+        catch (Exception e)
         {
-            Console.WriteLine("\nUnhandled :PPP");
+            Console.WriteLine("\nMoveEntry Exception\n\n"+e);
             ContinueReadKey();
         }
     }
     public void DeleteEntry()
     {
-                Console.Clear();
+        Console.Clear();
         Console.WriteLine("--------------------------");
         Console.WriteLine("|ID |     List Name      |");
         Console.WriteLine("--------------------------");
@@ -327,23 +359,23 @@ class Todo
 
             using (writer)
             {
-                foreach (string i in listTodo)
+                foreach (Entry i in listTodo)
                 {
-                    writer.WriteLine("todo:"+i);
+                    writer.WriteLine($"todo:::{i.Content}:::{i.Urgency}:::{i.DateTime}");
                 }
-                foreach (string i in listDoing)
+                foreach (Entry i in listDoing)
                 {
-                    writer.WriteLine("doing:"+i);
+                    writer.WriteLine($"doing:::{i.Content}:::{i.Urgency}:::{i.DateTime}");
                 }
-                foreach (string i in listFinished)
+                foreach (Entry i in listFinished)
                 {
-                    writer.WriteLine("finish:"+i);
+                    writer.WriteLine($"finish:::{i.Content}:::{i.Urgency}:::{i.DateTime}");
                 }
             }
         }
-        catch
+        catch (Exception e)
         {
-            Console.WriteLine("\nwirte fail "+path);
+            Console.WriteLine($"\nwirte fail {path}\n\n{e}");
             ContinueReadKey();
         }
     }
@@ -356,19 +388,24 @@ class Todo
             string line;
             while ((line = reader.ReadLine()) != null)
             {
-                string[] lineParse = line.Split(":");
+                string[] lineParse = line.Split(":::");
+                Entry entry = new Entry(
+                    lineParse[1],
+                    lineParse[2],
+                    lineParse[3]
+                );
 
                 if (lineParse[0] == "todo")
                 {
-                    listTodo.Add(lineParse[1]);
+                    listTodo.Add(entry);
                 }
                 else if (lineParse[0] == "doing")
                 {
-                    listDoing.Add(lineParse[1]);
+                    listDoing.Add(entry);
                 }
                 else if (lineParse[0] == "finish")
                 {
-                    listFinished.Add(lineParse[1]);
+                    listFinished.Add(entry);
                 }
             }
         }
