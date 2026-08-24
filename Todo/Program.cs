@@ -14,7 +14,7 @@ try
 catch
 { // Maybe I should just make the file without asking for input, makes it more smooth
     Console.Clear();
-    Console.Write(".vumc_todo.txt is not found. Create one? (Y/N):\n  > ");
+    Console.Write("save file is not found. Create one? (Y/N):\n  > ");
     if (Console.ReadKey().Key == ConsoleKey.Y)
     {
         Directory.CreateDirectory(todo.pathConfig);
@@ -24,25 +24,27 @@ catch
     }
     else
     {
-        Console.WriteLine("fwaaaah");
-        Console.ReadKey();
-        Environment.Exit(0);
+        Console.WriteLine("It's gonna create one when you make a new entry");
+        todo.ContinueReadKey();
     }
 }
 
 while (true)
 {
     Console.Clear();
+    Console.WriteLine("╭───────────────────────────────────────────╮");
+    Console.WriteLine("│ · · · · · · · · TODO LIST · · · · · · · · │");
+    Console.WriteLine("╰───────────────────────────────────────────╯");
     // Maybe I could add a big title with figlet or smth
-    Console.WriteLine("╭───┬──────────────────────────────────────────╮");
-    Console.WriteLine("│ 1 │ Add new entry                            │");
-    Console.WriteLine("│ 2 │ List all entries                         │");
-    Console.WriteLine("│ 3 │ Move entry to different list             │");
-    Console.WriteLine("│ 4 │ Trash entry                              │");
-    Console.WriteLine("│ 5 │ Edit Entry                               │");
-    Console.WriteLine("│ 6 │ Settings                                 │");
-    Console.WriteLine("│ 7 │ Exit                                     │");
-    Console.WriteLine("╰───┴──────────────────────────────────────────╯");
+    Console.WriteLine("╭───┬───────────────────────────────────────╮");
+    Console.WriteLine("│ 1 │ Add new entry                         │");
+    Console.WriteLine("│ 2 │ List all entries                      │");
+    Console.WriteLine("│ 3 │ Move entry to different list          │");
+    Console.WriteLine("│ 4 │ Trash entry                           │");
+    Console.WriteLine("│ 5 │ Edit Entry                            │");
+    Console.WriteLine("│ 6 │ Settings                              │");
+    Console.WriteLine("│ 7 │ Exit                                  │");
+    Console.WriteLine("╰───┴───────────────────────────────────────╯");
     Console.Write("Select option:\n  > ");
 
     switch (Console.ReadKey().Key)
@@ -399,9 +401,9 @@ class Todo
         Console.WriteLine("│ 1 │ To-Do              │");
         Console.WriteLine("│ 2 │ Doing              │");
         Console.WriteLine("│ 3 │ Finished           │");
-        Console.WriteLine("│ . ├────────────────────┤");
-        Console.WriteLine("│ . │      Actions       │");
-        Console.WriteLine("│ . ├────────────────────┤");
+        Console.WriteLine("│ · ├────────────────────┤");
+        Console.WriteLine("│ · │      Actions       │");
+        Console.WriteLine("│ · ├────────────────────┤");
         Console.WriteLine("│ 4 │ View trash list    │");
         Console.WriteLine("│ 5 │ Clear trash list   │");
         Console.WriteLine("╰───┴────────────────────╯");
@@ -516,7 +518,7 @@ class Todo
     public void Config()
     {
         Console.Clear();
-        Console.WriteLine("Hi my name is Verity");
+        Console.WriteLine("Nothing here :PP");
         ContinueReadKey();
     }
     public void WriteFile()
@@ -549,33 +551,41 @@ class Todo
     }
     public void ReadFile()
     {
-        StreamReader reader = new StreamReader(path);
-
-        using (reader)
+        try
         {
-            string line;
-            while ((line = reader.ReadLine()) != null)
-            {
-                string[] lineParse = line.Split(":::");
-                Entry entry = new Entry(
-                    lineParse[1],
-                    lineParse[2],
-                    lineParse[3]
-                );
+            StreamReader reader = new StreamReader(path);
 
-                if (lineParse[0] == "todo")
+            using (reader)
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    listTodo.Add(entry);
-                }
-                else if (lineParse[0] == "doing")
-                {
-                    listDoing.Add(entry);
-                }
-                else if (lineParse[0] == "finish")
-                {
-                    listFinished.Add(entry);
+                    string[] lineParse = line.Split(":::");
+                    Entry entry = new Entry(
+                        lineParse[1],
+                        lineParse[2],
+                        lineParse[3]
+                    );
+
+                    if (lineParse[0] == "todo")
+                    {
+                        listTodo.Add(entry);
+                    }
+                    else if (lineParse[0] == "doing")
+                    {
+                        listDoing.Add(entry);
+                    }
+                    else if (lineParse[0] == "finish")
+                    {
+                        listFinished.Add(entry);
+                    }
                 }
             }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Read Exception\n\n"+e);
+            ContinueReadKey();
         }
     }
     public void ContinueReadKey()
