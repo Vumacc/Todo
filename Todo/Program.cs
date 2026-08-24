@@ -106,9 +106,9 @@ class Todo
     }
     private void MoveEntryTo(List<Entry> origin, int destination, bool trashEntry = false)
     {
-        Console.WriteLine("------------------------------------------------");
+        Console.WriteLine("╭──────────────────────────────────────────────────────────────────╶─╶╶╶");
         listList(origin);
-        Console.WriteLine("------------------------------------------------");
+        Console.WriteLine("╰──────────────────────────────────────────────────────────────────╶─╶╶╶");
 
         string selectText = trashEntry ?
         $"Choose index of entry you want to delete. Select 0 to trash all.\nSelect entry:\n  > "
@@ -234,15 +234,15 @@ class Todo
 
             Console.Clear();
             Console.WriteLine("Current entry urgency: "+listCopy[entryIndex].Urgency);
-            Console.WriteLine($"╭───────────────────────╮");
-            Console.WriteLine($"│ID |   Urgency level   │");
-            Console.WriteLine($"├───────────────────────┤");
-            Console.WriteLine($"│ 1 | {Urgency(1)} Immediate       │");
-            Console.WriteLine($"│ 2 | {Urgency(2)} Emergency       │");
-            Console.WriteLine($"│ 3 | {Urgency(3)} Urgent          │");
-            Console.WriteLine($"│ 4 | {Urgency(4)} Semi-urgent     │");
-            Console.WriteLine($"│ 5 | {Urgency(5)} Non-urgent      │");
-            Console.WriteLine($"╰───────────────────────╯");
+            Console.WriteLine($"╭───┬───────────────────╮");
+            Console.WriteLine($"│ID │   Urgency level   │");
+            Console.WriteLine($"├───┼───────────────────┤");
+            Console.WriteLine($"│ 1 │ {Urgency(1)} Immediate       │");
+            Console.WriteLine($"│ 2 │ {Urgency(2)} Emergency       │");
+            Console.WriteLine($"│ 3 │ {Urgency(3)} Urgent          │");
+            Console.WriteLine($"│ 4 │ {Urgency(4)} Semi-urgent     │");
+            Console.WriteLine($"│ 5 │ {Urgency(5)} Non-urgent      │");
+            Console.WriteLine($"╰───┴───────────────────╯");
             Console.WriteLine("Choose ID of new urgency level");
             Console.Write("Replace content with:\n  > ");
             int newUrgency = Convert.ToInt32(Console.ReadLine());
@@ -345,13 +345,13 @@ class Todo
     public void MoveEntry()
     {
         Console.Clear();
-        Console.WriteLine("--------------------------");
-        Console.WriteLine("|ID |     List Name      |");
-        Console.WriteLine("--------------------------");
-        Console.WriteLine("| 1 | To-Do              |");
-        Console.WriteLine("| 2 | Doing              |");
-        Console.WriteLine("| 3 | Finished           |");
-        Console.WriteLine("--------------------------");
+        Console.WriteLine("╭───┬────────────────────╮");
+        Console.WriteLine("│ID │     List Name      │");
+        Console.WriteLine("├───┼────────────────────┤");
+        Console.WriteLine("│ 1 │ To-Do              │");
+        Console.WriteLine("│ 2 │ Doing              │");
+        Console.WriteLine("│ 3 │ Finished           │");
+        Console.WriteLine("╰───┴────────────────────╯");
 
         Console.WriteLine("Origin is where an entry will be taken from. Destination is where it will be moved to.");
         Console.WriteLine("Select list ID of origin and destination (> {origin} to {destination}):");
@@ -393,22 +393,21 @@ class Todo
     public void DeleteEntry()
     {
         Console.Clear();
-        Console.WriteLine("--------------------------");
-        Console.WriteLine("|ID |     List Name      |");
-        Console.WriteLine("--------------------------");
-        Console.WriteLine("| 1 | To-Do              |");
-        Console.WriteLine("| 2 | Doing              |");
-        Console.WriteLine("| 3 | Finished           |");
-        Console.WriteLine("| . |--------------------|");
-        Console.WriteLine("| . |      Actions       |");
-        Console.WriteLine("| . |--------------------|");
-        Console.WriteLine("| 4 | View trash list    |");
-        Console.WriteLine("| 5 | Clear trash list   |");
-        Console.WriteLine("--------------------------");
+        Console.WriteLine("╭───┬────────────────────╮");
+        Console.WriteLine("│ID │     List Name      │");
+        Console.WriteLine("├───┼────────────────────┤");
+        Console.WriteLine("│ 1 │ To-Do              │");
+        Console.WriteLine("│ 2 │ Doing              │");
+        Console.WriteLine("│ 3 │ Finished           │");
+        Console.WriteLine("│ . ├────────────────────┤");
+        Console.WriteLine("│ . │      Actions       │");
+        Console.WriteLine("│ . ├────────────────────┤");
+        Console.WriteLine("│ 4 │ View trash list    │");
+        Console.WriteLine("│ 5 │ Clear trash list   │");
+        Console.WriteLine("╰───┴────────────────────╯");
 
-        Console.WriteLine("Select list ID of where you want to trash an entry, or action you would like to do:");
+        Console.WriteLine("\nSelect list ID of where you want to trash an entry, or action you would like to do:");
         Console.Write("  > ");
-
         try
         {
             int trashInput = Convert.ToInt32(Console.ReadLine());
@@ -429,9 +428,9 @@ class Todo
                 case 4: // View Trash list
                     Console.Clear();
                     Console.WriteLine("Trash list is not saved unlike other lists");
-                    Console.WriteLine("------------------------------------------------");
+                    Console.WriteLine("╭──────────────────────────────────────────────────────────────────╶─╶╶╶");
                     listList(listTrash);
-                    Console.WriteLine("------------------------------------------------");
+                    Console.WriteLine("╰──────────────────────────────────────────────────────────────────╶─╶╶╶");
                     ContinueReadKey();
                     break;
                 case 5: // Clear Trash list
@@ -452,20 +451,19 @@ class Todo
     public void EditEntry()
     {
         Console.Clear();
-        Console.WriteLine("------------------------------------");
-        Console.WriteLine("|ID | List Name |                  |");
-        Console.WriteLine("------------------------------------");
-        Console.WriteLine("| 1 | To-Do                        |");
-        Console.WriteLine("| 2 | Doing                        |");
-        Console.WriteLine("| 3 | Finished                     |");
-        Console.WriteLine("------------------------------------");
-        Console.WriteLine();
-        Console.WriteLine("------------------------------------");
-        Console.WriteLine("|ID | Actions                      |");
-        Console.WriteLine("|---|------------------------------|");
-        Console.WriteLine("| 1 | Change content of an entry   |");
-        Console.WriteLine("| 2 | Change urgency of an entry   |");
-        Console.WriteLine("|----------------------------------|");
+        Console.WriteLine("╭───┬──────────────────────────────╮");
+        Console.WriteLine("│ID │         List Name            │");
+        Console.WriteLine("├───┼──────────────────────────────┤");
+        Console.WriteLine("│ 1 │ To-Do                        │");
+        Console.WriteLine("│ 2 │ Doing                        │");
+        Console.WriteLine("│ 3 │ Finished                     │");
+        Console.WriteLine("╰───┴──────────────────────────────╯");
+        Console.WriteLine("╭───┬──────────────────────────────╮");
+        Console.WriteLine("│ID │          Actions             │");
+        Console.WriteLine("├───┼──────────────────────────────┤");
+        Console.WriteLine("│ 1 │ Change content of an entry   │");
+        Console.WriteLine("│ 2 │ Change urgency of an entry   │");
+        Console.WriteLine("╰───┴──────────────────────────────╯");
 
         Console.WriteLine("Choose ID of list and the ID of the action you would like to do it");
         Console.WriteLine("(> {ListID} {ActionID})");
