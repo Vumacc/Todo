@@ -187,7 +187,7 @@ class Todo
             entryIndex--; // Decrementing for same reason in MoveEntryTo()
 
             Console.Clear();
-            Console.WriteLine("Entry content:");
+            Console.WriteLine("Current entry content:");
             Console.WriteLine($"  \"{listCopy[entryIndex].Content}\"");
             Console.Write("\nReplace content with:\n  > ");
             string newContent = Console.ReadLine();
@@ -222,8 +222,57 @@ class Todo
     private void EditEntryUrgency(List<Entry> listCopy, int listId)
     {
         Console.Clear();
-        Console.WriteLine("editurgency");
-        ContinueReadKey();
+        Console.WriteLine("╭──────────────────────────────────────────────────────────────────╶─╶╶╶");
+        listList(listCopy);
+        Console.WriteLine("╰──────────────────────────────────────────────────────────────────╶─╶╶╶");
+        Console.Write("Select index of entry you want to change the urgency of:\n  > ");
+
+        try
+        {
+            int entryIndex = Convert.ToInt32(Console.ReadLine());
+            entryIndex--; // Decrementing for same reason in MoveEntryTo()
+
+            Console.Clear();
+            Console.WriteLine("Current entry urgency: "+listCopy[entryIndex].Urgency);
+            Console.WriteLine($"╭───────────────────────╮");
+            Console.WriteLine($"│ID |   Urgency level   │");
+            Console.WriteLine($"├───────────────────────┤");
+            Console.WriteLine($"│ 1 | {Urgency(1)} Immediate       │");
+            Console.WriteLine($"│ 2 | {Urgency(2)} Emergency       │");
+            Console.WriteLine($"│ 3 | {Urgency(3)} Urgent          │");
+            Console.WriteLine($"│ 4 | {Urgency(4)} Semi-urgent     │");
+            Console.WriteLine($"│ 5 | {Urgency(5)} Non-urgent      │");
+            Console.WriteLine($"╰───────────────────────╯");
+            Console.WriteLine("Choose ID of new urgency level");
+            Console.Write("Replace content with:\n  > ");
+            int newUrgency = Convert.ToInt32(Console.ReadLine());
+
+            switch (listId)
+            {
+                case 1: // To-Do
+                    Entry entryTodo = listTodo[entryIndex];
+                    entryTodo.Urgency = Urgency(newUrgency);
+                    listTodo[entryIndex] = entryTodo;
+                    break;
+                case 2: // Doing
+                    Entry entryDoing = listDoing[entryIndex];
+                    entryDoing.Urgency = Urgency(newUrgency);
+                    listDoing[entryIndex] = entryDoing;
+                    break;
+                case 3: // Finished
+                    Entry entryFinished = listFinished[entryIndex];
+                    entryFinished.Urgency = Urgency(newUrgency);
+                    listFinished[entryIndex] = entryFinished;
+                    break;
+                default:
+                    throw new Exception("listId out of range");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("EditEntryUrgency() exception\n\n"+e);
+            ContinueReadKey();
+        }
     }
     private string Urgency(int urgency)
     {
@@ -251,15 +300,15 @@ class Todo
         string content = Console.ReadLine();
 
         Console.WriteLine();
-        Console.WriteLine("-------------------------");
-        Console.WriteLine("|ID |   Urgency level   |");
-        Console.WriteLine("-------------------------");
-        Console.WriteLine($"| 1 | {Urgency(1)} Immediate      |");
-        Console.WriteLine($"| 2 | {Urgency(2)} Emergency      |");
-        Console.WriteLine($"| 3 | {Urgency(3)} Urgent         |");
-        Console.WriteLine($"| 4 | {Urgency(4)} Semi-urgent    |");
-        Console.WriteLine($"| 5 | {Urgency(5)} Non-urgent     |");
-        Console.WriteLine("-------------------------");
+        Console.WriteLine($"╭───────────────────────╮");
+        Console.WriteLine($"│ID |   Urgency level   │");
+        Console.WriteLine($"├───────────────────────┤");
+        Console.WriteLine($"│ 1 | {Urgency(1)} Immediate       │");
+        Console.WriteLine($"│ 2 | {Urgency(2)} Emergency       │");
+        Console.WriteLine($"│ 3 | {Urgency(3)} Urgent          │");
+        Console.WriteLine($"│ 4 | {Urgency(4)} Semi-urgent     │");
+        Console.WriteLine($"│ 5 | {Urgency(5)} Non-urgent      │");
+        Console.WriteLine($"╰───────────────────────╯");
         Console.Write("Choose ID of urgency you want to assign to the entry. Default = 5.\nSelect ID:\n  > ");
 
         int urgency = 5;
