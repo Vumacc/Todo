@@ -1,4 +1,11 @@
-﻿Todo todo = new Todo();
+﻿// For making the ui!!
+// ╭──┬──╮
+// │  │  │
+// ├──┼──┤
+// │  │  │
+// ╰──┴──╯
+
+Todo todo = new Todo();
 
 try
 {
@@ -25,17 +32,17 @@ catch
 
 while (true)
 {
-
     Console.Clear();
     // Maybe I could add a big title with figlet or smth
-    Console.WriteLine("------------------------------------------------");
-    Console.WriteLine("| 1 | Add new entry                            |");
-    Console.WriteLine("| 2 | List all entries                         |");
-    Console.WriteLine("| 3 | Move entry to different list             |");
-    Console.WriteLine("| 4 | Trash entry                              |");
-    Console.WriteLine("| 5 | Settings                                 |");
-    Console.WriteLine("| 6 | Exit                                     |");
-    Console.WriteLine("------------------------------------------------");
+    Console.WriteLine("╭───┬──────────────────────────────────────────╮");
+    Console.WriteLine("│ 1 │ Add new entry                            │");
+    Console.WriteLine("│ 2 │ List all entries                         │");
+    Console.WriteLine("│ 3 │ Move entry to different list             │");
+    Console.WriteLine("│ 4 │ Trash entry                              │");
+    Console.WriteLine("│ 5 │ Edit Entry                               │");
+    Console.WriteLine("│ 6 │ Settings                                 │");
+    Console.WriteLine("│ 7 │ Exit                                     │");
+    Console.WriteLine("╰───┴──────────────────────────────────────────╯");
     Console.Write("Select option:\n  > ");
 
     switch (Console.ReadKey().Key)
@@ -52,20 +59,14 @@ while (true)
         case ConsoleKey.D4: // Delete entry
             todo.DeleteEntry();
             break;
-        case ConsoleKey.D5: // Config
-            Environment.Exit(0); // Todo: make config shit. maybe. still vague concept
+        case ConsoleKey.D5: // Edit entry
+            todo.EditEntry();
             break;
-        case ConsoleKey.D6: // Exit
+        case ConsoleKey.D6: // Config
+            todo.Config();
+            break;
+        case ConsoleKey.D7: // Exit
             Environment.Exit(0);
-            break;
-        case ConsoleKey.D7: // Debug write
-            todo.WriteFile();
-            break;
-        case ConsoleKey.D8: // Debug read
-            todo.ReadFile();
-            break;
-        case ConsoleKey.D9: // Debug delete save
-            File.Delete(todo.path);
             break;
         default:
             break;
@@ -84,10 +85,6 @@ struct Entry
         Urgency = urgency;
         DateTime = dateTime;
     }
-
-    public Entry(string v1, string v2, string v3, string v4) : this()
-    {
-    }
 }
 
 class Todo
@@ -104,7 +101,7 @@ class Todo
     {
         foreach (Entry i in list)
         {
-            Console.WriteLine($"| {list.IndexOf(i)+1} | {i.Urgency} {i.Content}");
+            Console.WriteLine($"│ {list.IndexOf(i)+1} │ {i.Urgency} {i.Content}");
         }
     }
     private void MoveEntryTo(List<Entry> origin, int destination, bool trashEntry = false)
@@ -176,6 +173,58 @@ class Todo
                 break;
         }
     }
+    private void EditEntryContent(List<Entry> listCopy, int listId)
+    {
+        Console.Clear();
+        Console.WriteLine("╭──────────────────────────────────────────────────────────────────╶─╶╶╶");
+        listList(listCopy);
+        Console.WriteLine("╰──────────────────────────────────────────────────────────────────╶─╶╶╶");
+        Console.Write("Select index of entry you want to change the content of:\n  > ");
+
+        try
+        {
+            int entryIndex = Convert.ToInt32(Console.ReadLine());
+            entryIndex--; // Decrementing for same reason in MoveEntryTo()
+
+            Console.Clear();
+            Console.WriteLine("Entry content:");
+            Console.WriteLine($"  \"{listCopy[entryIndex].Content}\"");
+            Console.Write("\nReplace content with:\n  > ");
+            string newContent = Console.ReadLine();
+
+            switch (listId)
+            {
+                case 1: // To-Do
+                    Entry entryTodo = listTodo[entryIndex];
+                    entryTodo.Content = newContent;
+                    listTodo[entryIndex] = entryTodo;
+                    break;
+                case 2: // Doing
+                    Entry entryDoing = listDoing[entryIndex];
+                    entryDoing.Content = newContent;
+                    listDoing[entryIndex] = entryDoing;
+                    break;
+                case 3: // Finished
+                    Entry entryFinished = listFinished[entryIndex];
+                    entryFinished.Content = newContent;
+                    listFinished[entryIndex] = entryFinished;
+                    break;
+                default:
+                    throw new Exception("listId out of range");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("EditEntryContent() exception\n\n"+e);
+            ContinueReadKey();
+        }
+    }
+    private void EditEntryUrgency(List<Entry> listCopy, int listId)
+    {
+        Console.Clear();
+        Console.WriteLine("editurgency");
+        ContinueReadKey();
+    }
     private string Urgency(int urgency)
     {
         switch (urgency)
@@ -199,7 +248,7 @@ class Todo
     {
         Console.Clear();
         Console.Write("Add new entry to To-Do list:\n  > ");
-        string? content = Console.ReadLine();
+        string content = Console.ReadLine();
 
         Console.WriteLine();
         Console.WriteLine("-------------------------");
@@ -229,19 +278,19 @@ class Todo
     public void ListEntry()
     {
         Console.Clear();
-        Console.WriteLine("------ To-Do -------------------------------------------------------------");
+        Console.WriteLine("╭───── To-Do ──────────────────────────────────────────────────────────────╶─╶╶╶");
         listList(listTodo);
+        Console.WriteLine("╰──────────────────────────────────────────────────────────────────────────╶─╶╶╶");
 
         Console.WriteLine();
-        Console.WriteLine("------ Doing--------------------------------------------------------------");
+        Console.WriteLine("╭───── Doing ──────────────────────────────────────────────────────────────╶─╶╶╶");
         listList(listDoing);
+        Console.WriteLine("╰──────────────────────────────────────────────────────────────────────────╶─╶╶╶");
 
         Console.WriteLine();
-        Console.WriteLine("------ Finished ----------------------------------------------------------");
+        Console.WriteLine("╭───── Finished ───────────────────────────────────────────────────────────╶─╶╶╶");
         listList(listFinished);
-
-        Console.Write("\n--------------------------------------------------------------------------\n");
-
+        Console.WriteLine("╰──────────────────────────────────────────────────────────────────────────╶─╶╶╶");
         ContinueReadKey();
     }
     public void MoveEntry()
@@ -256,12 +305,12 @@ class Todo
         Console.WriteLine("--------------------------");
 
         Console.WriteLine("Origin is where an entry will be taken from. Destination is where it will be moved to.");
-        Console.WriteLine("Select list ID of origin and destination ({origin} to {destination}):");
+        Console.WriteLine("Select list ID of origin and destination (> {origin} to {destination}):");
         Console.Write("  > ");
 
         try
         {
-            string? rawMoveInput = Console.ReadLine();
+            string rawMoveInput = Console.ReadLine();
             string[] moveInput = rawMoveInput.Split(" ");
 
             int origin = Convert.ToInt32(moveInput[0]);
@@ -350,6 +399,78 @@ class Todo
             Console.WriteLine("\nUnhandled :PPP");
             ContinueReadKey();
         }
+    }
+    public void EditEntry()
+    {
+        Console.Clear();
+        Console.WriteLine("------------------------------------");
+        Console.WriteLine("|ID | List Name |                  |");
+        Console.WriteLine("------------------------------------");
+        Console.WriteLine("| 1 | To-Do                        |");
+        Console.WriteLine("| 2 | Doing                        |");
+        Console.WriteLine("| 3 | Finished                     |");
+        Console.WriteLine("------------------------------------");
+        Console.WriteLine();
+        Console.WriteLine("------------------------------------");
+        Console.WriteLine("|ID | Actions                      |");
+        Console.WriteLine("|---|------------------------------|");
+        Console.WriteLine("| 1 | Change content of an entry   |");
+        Console.WriteLine("| 2 | Change urgency of an entry   |");
+        Console.WriteLine("|----------------------------------|");
+
+        Console.WriteLine("Choose ID of list and the ID of the action you would like to do it");
+        Console.WriteLine("(> {ListID} {ActionID})");
+        Console.WriteLine("Select list ID and action ID:");
+        Console.Write("  > ");
+
+        try
+        {
+            string rawEditInput = Console.ReadLine();
+            string[] EditInput = rawEditInput.Split(" ");
+
+            int subject = Convert.ToInt32(EditInput[0]);
+            int action = Convert.ToInt32(EditInput[1]);
+
+            List<Entry> subjectList;
+
+            switch (subject)
+            {
+                case 1:
+                    subjectList = listTodo;
+                    break;
+                case 2:
+                    subjectList = listDoing;
+                    break;
+                case 3:
+                    subjectList = listFinished;
+                    break;
+                default:
+                    throw new Exception("EditEntry() subject out of range");
+            }
+
+            switch (action)
+            {
+                case 1:
+                    EditEntryContent(subjectList, subject);
+                    break;
+                case 2:
+                    EditEntryUrgency(subjectList, subject);
+                    break;
+                default:
+                    throw new Exception("EditEntry() action out of range");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("\nEditEntry Exception\n\n"+e);
+            ContinueReadKey();
+        }
+    }
+    public void Config()
+    {
+        Console.Clear();
+        Console.WriteLine("Hi my name is Verity");
+        ContinueReadKey();
     }
     public void WriteFile()
     {
